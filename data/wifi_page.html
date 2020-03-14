@@ -1,0 +1,197 @@
+<head>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <style>
+      body {
+         background-image: linear-gradient(to top, #30CFD0 0%, #330867 100%);
+         margin: 0px;
+         font-family: 'Ubuntu', sans-serif;
+         background-size: 100% 110%;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      a {
+         margin: 0;
+         padding: 0;
+      }
+
+      .login {
+         margin: 0 auto;
+         max-width: 500px;
+      }
+
+      .login-header {
+         color: #fff;
+         text-align: center;
+         font-size: 300%;
+         margin: 50px !important;
+      }
+
+      .login-form h3 {
+         text-align: left;
+         margin-left: 40px;
+         color: #fff;
+      }
+
+      .login-form {
+         box-sizing: border-box;
+         padding-top: 15px;
+         margin: 5% auto;
+         text-align: center;
+      }
+
+      input[type="text"],
+      input[type="password"] {
+         max-width: 400px;
+         width: 80%;
+         line-height: 3em;
+         font-family: 'Ubuntu', sans-serif;
+         margin: 1em 2em;
+         border-radius: 5px;
+         border: 2px solid #F2F2F2;
+         outline: none;
+         padding-left: 10px;
+      }
+
+      select {
+         max-width: 400px;
+         width: 80%;
+         line-height: 3em;
+         font-family: 'Ubuntu', sans-serif;
+         margin: 1em 2em;
+         border-radius: 5px;
+         border: 2px solid #F2F2F2;
+         outline: none;
+         padding-left: 10px;
+         height: 45px;
+         background: white;
+      }
+
+      .login-form input[type="button"] {
+         height: 45px;
+         width: 150px;
+         background: white;
+         border: 1px solid #F2F2F2;
+         border-radius: 20px;
+         color: #2B4F73;
+         text-transform: uppercase;
+         font-family: 'Ubuntu', sans-serif;
+         cursor: pointer;
+      }
+
+      .sign-up {
+         color: #F2F2F2;
+         margin-left: -70%;
+         cursor: pointer;
+         text-decoration: underline;
+      }
+
+      /*Media Querie*/
+      @media only screen and (min-width : 150px) and (max-width : 530px) {
+         .login-form h3 {
+            text-align: center;
+            margin: 0;
+         }
+
+         .sign-up,
+         .no-access {
+            margin: 10px 0;
+         }
+
+         .login-button {
+            margin-bottom: 10px;
+         }
+      }
+
+      .try-again {
+         text-align: center;
+         font-size: 30px;
+         color: white;
+      }
+
+      .wifiList {
+         visibility: hidden;
+      }
+
+      .hint {
+         color: white
+      }
+   </style>
+</head>
+<div class="login">
+   <div class="login-header">
+   </div>
+   <div class="login-form">
+      <h3>Select WiFi:</h3>
+      <select id="selectWifi">
+         <option>Choose a wifi</option>
+      </select>
+      <br>
+      <h3>Password:</h3>
+      <input type="text" id="pwd" placeholder="Password" onkeyup="checkFormat()">
+      <div id="hint" class="hint"></div>
+      <br><br>
+      <input id="button" onclick="postRequest()" type="button" value="SUBMIT" class="login-button" />
+      <br>
+   </div>
+</div>
+<div class="error-page">
+   <div class="try-again" id="message"></div>
+</div>
+<script>
+   var wifiArray;
+   function func1() {
+      var wifiStr = document.getElementById('wifiList').innerHTML;
+      wifiArray = wifiStr.split(',');
+      console.log(wifiArray);
+      var select = document.getElementById("selectWifi");
+      var options = wifiArray;
+      for (var i = 0; i < options.length; i++) {
+         var opt = options[i];
+         var el = document.createElement("option");
+         el.textContent = opt;
+         el.value = opt;
+         select.appendChild(el);
+      }
+   }
+   function postRequest() {
+      console.log('post called');
+      var e = document.getElementById("selectWifi");
+      var wifi = e.options[e.selectedIndex].value;
+      var pwd = document.getElementById("pwd").value;
+      var data = wifi + "|" + pwd + "|";
+      var url = "http://192.168.1.1/";
+      var method = "POST";
+      var postData = data;
+      var shouldBeAsync = true;
+      var request = new XMLHttpRequest();
+      request.onload = function () {
+         var status = request.status; // HTTP response status, e.g., 200 for "200 OK"
+         var data = request.responseText; // Returned data, e.g., an HTML document.
+         console.log(status, data.length);
+
+         document.getElementById("message").innerHTML = data;
+      }
+      request.open(method, url, shouldBeAsync);
+      request.setRequestHeader("Content-Type", "text/plain");
+      request.send(postData);
+   }
+   function checkFormat() {
+      console.log('keyup');
+      if (document.getElementById("pwd").value === "" || document.getElementById("pwd").value.includes("|")) {
+         document.getElementById('button').disabled = true;
+         document.getElementById('hint').innerHTML = 'Please enter a password without "|" character';
+      } else {
+         document.getElementById('button').disabled = false;
+         document.getElementById('hint').innerHTML = '';
+      }
+   }
+   window.onload = function () {
+      func1();
+      checkFormat();
+   };
+</script>
